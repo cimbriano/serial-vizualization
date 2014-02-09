@@ -3,6 +3,18 @@ var app = express();
 var engines = require('consolidate');
 var path = require('path');
 
+// Socket.io
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
+
+server.listen(3000);
+console.log('Listening on port 3000');
+
+// Set up socket.io
+io.sockets.on('connection', function(socket){
+    socket.emit('news', { hello: 'world'});
+});
+
 
 // Serial Port Setup
 var SerialPort = require('serialport').SerialPort
@@ -30,8 +42,3 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function(req, res) {
     res.render('index');
 });
-
-
-
-app.listen(3000);
-console.log('Listening on port 3000');

@@ -1,3 +1,11 @@
+<script src='socket.io/socket.io.js'></script>
+<script>
+	var socket = io.connect('http://localhost:3000');
+	socket.on('news', function(data){
+		console.log(data);
+	});
+</script>
+
 <body>
     <h1>Real-time Arduino Visualization</h1>
     <p id='title'>Hello World</p>

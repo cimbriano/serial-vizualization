@@ -10,26 +10,37 @@ var io = require('socket.io').listen(server);
 server.listen(3000);
 console.log('Listening on port 3000');
 
-// Set up socket.io
-io.sockets.on('connection', function(socket){
-    socket.emit('news', { hello: 'world'});
-});
-
-
 // Serial Port Setup
 var SerialPort = require('serialport').SerialPort
 var serialport = new SerialPort('/dev/tty.usbmodemfa131', {
-    baudrate: 115200,
+    baudrate: 28800,
     databits: 8,
     stopbits: 1,
 });
 
 serialport.on('open', function(){
     console.log('Serial Port Open');
+});
 
-    serialport.on('data', function(data){
-        console.log('Data received: ' + data);
-    });
+
+
+// Set up socket.io
+io.sockets.on('connection', function(socket){
+    console.log(io.sockets);
+    socket.emit('news', { hello: 'world'});
+});
+
+serialport.on('data', function(data){
+    // console.log('Data received: ' + String(data));
+    // console.log(typeof String(data));
+    var parts = String(data).trim().split(" ");
+
+    // Skip partial messages
+    if(parts.length == 3) {
+        io.sockets.emit('arduino', { pin: parts[0],
+                             val: parts[1],
+                             dir: parts[2] });
+    }
 });
 
 

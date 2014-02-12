@@ -29,17 +29,30 @@ io.sockets.on('connection', function(socket){
     socket.emit('news', { hello: 'world'});
 });
 
-serialport.on('data', function(data){
-    // console.log('Data received: ' + String(data));
-    // console.log(typeof String(data));
-    var parts = String(data).trim().split(" ");
+// Store data until a new line character is found.
+var data_buffer = "";
 
-    // Skip partial messages
-    if(parts.length == 3) {
-        io.sockets.emit('arduino', { pin: parts[0],
-                             val: parts[1],
-                             dir: parts[2],
-                             raw: String(data) });
+serialport.on('data', function(data){
+
+    data_buffer += data;
+
+    // Check if this ends in a newline
+    if(data_buffer.slice(-1) == '\n') {
+
+        // console.log('Data received: ' + String(data_buffer));
+        // console.log(typeof String(data_buffer));
+        var parts = String(data_buffer).trim().split(" ");
+
+        // Skip partial messages
+        if(parts.length == 3) {
+            io.sockets.emit('arduino', { pin: parts[0],
+                                 val: parts[1],
+                                 dir: parts[2],
+                                 raw: String(data_buffer) });
+        }
+
+        //Reset buffer
+        data_buffer = "";
     }
 });
 

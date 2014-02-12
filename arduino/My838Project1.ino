@@ -16,19 +16,20 @@ void setup() {
 }
 
 void loop() {
-  // // Pin0 is output
-  // serial_write(0, pin0_val, false);
-  // pin0_val = pin0_val + (pin0_direction + random(0, 10));
-  // if(pin0_val > 900 || pin0_val < 250) { pin0_direction = pin0_direction * -1;}
+  // Pin0 is output
+  serial_write(0, pin0_val, false);
+  pin0_val = pin0_val + (pin0_direction * random(0, 10));
+  if(pin0_val > 900 || pin0_val < 250) { pin0_direction = pin0_direction * -1;}
   
-  // // Step up and down on pin 3
-  // pin3_val = pin3_val + step_size;
-  // if(pin3_val >= 100 || pin3_val <= 0) { step_size = step_size * -1;}
-  // serial_write(3, pin3_val, true);
+  // Step up and down on pin 3
+  pin3_val = pin3_val + step_size;
+  if(pin3_val >= 100 || pin3_val <= 0) { step_size = step_size * -1;}
+  serial_write(3, pin3_val, true);
   
-  serial_write(3, 100, true);
+  // Serial.println("Printing from the sketch");
+  // serial_write(3, 100, true);
 
-  delay(1000);
+  delay(200);
 }
 
 void serial_write(int pin, int value, boolean isInput) {

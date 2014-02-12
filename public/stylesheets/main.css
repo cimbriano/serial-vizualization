@@ -1,0 +1,47 @@
+h1 {
+	color: red;
+}
+
+h2 {
+        float:left;
+        width: 48%;
+}
+
+#monitor {
+	background: #BBB;
+}
+
+#input_chart_container {
+        border: 1px solid black;
+        width: 48%;
+}
+
+#output_chart_container{
+        border: 1px solid black;
+        width: 48%;
+
+        position: relative;
+        display: inline-block;
+        font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Rickshaw */
+.chart_container {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, Helvetica, sans-serif;
+}
+.chart {
+        display: inline-block;
+        margin-left: 40px;
+        /*float: left;*/
+}
+.rickshaw_graph .y_ticks {
+        left: 0;
+}
+.y_axis {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+}

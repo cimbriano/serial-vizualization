@@ -1,20 +1,139 @@
-<script src='socket.io/socket.io.js'></script>
-<script>
-	var socket = io.connect('http://localhost:3000');
-	socket.on('news', function(data){
-		console.log(data);
-	});
-
-	socket.on('arduino', function(data){
-		console.log("Arduino");
-		console.log(data);
-	});
-</script>
+<head>
+    <link href="stylesheets/main.css" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/rickshaw.css" rel="stylesheet" type="text/css" />
+</head>
 
 <body>
     <h1>Real-time Arduino Visualization</h1>
     <p id='title'>Hello World</p>
+
+    <div id="controls">
+        <button onclick="clearMonitor()">Clear Monitor</button>
+    </div>
+
+    <div>
+        <h2>Inputs</h2>
+        <h2>Outputs</h2>
+    </div>
+    <div id="input_chart_container" class="chart_container">
+        <!-- <h2>Inputs</h2> -->
+        <div id="in_y_axis" class="y_axis"></div>
+        <div id="in_chart"></div>
+    </div>
+
+    <div id="output_chart_container" class="chart_container">
+        <!-- <h2>Outputs</h2> -->
+        <div id="out_y_axis" class="y_axis"></div>
+        <div id="out_chart" class="chart"></div>
+    </div>
+
+    <div id="chart_container">
+        <div id="y_axis" ></div>
+        <div id="chart"></div>
+    </div>
+    <div id="monitor">
+        <p>Sutff</p>
+        <p>More Stuff</p>
+    </div>
 </body>
+
+
+<script src='socket.io/socket.io.js'></script>
+<script type="text/javascript" src="/javascripts/rickshaw-1.4.5/vendor/d3.min.js"></script>
+<script type="text/javascript" src="/javascripts/rickshaw-1.4.5/vendor/d3.layout.min.js"></script>
+<script type="text/javascript" src="/javascripts/rickshaw-1.4.5/rickshaw.js"></script>
+
+<script>
+    function clearMonitor() {
+        document.getElementById('monitor').innerHTML = "";
+    }
+</script>
+
+<script>
+    // Rickshaw stuff
+    var palette = new Rickshaw.Color.Palette({ scheme: 'spectrum14' });
+
+    var tv = 250;
+
+    var in_graph = new Rickshaw.Graph({
+        element: document.querySelector('#in_chart'),
+        // width: 900,
+        height: 500,
+        min: 0,
+        max: 1024,
+        renderer: 'line',
+        series: new Rickshaw.Series.FixedDuration([{name: 'default'}], undefined, {
+            timeInterval: tv,
+            maxDataPoints: 10,
+            timeBase: new Date().getTime() / 1000
+        })
+    });
+
+    var out_graph = new Rickshaw.Graph({
+        element: document.querySelector('#out_chart'),
+        height: 500,
+        min: 0,
+        max: 1024,
+        renderer: 'line',
+        series: new Rickshaw.Series.FixedDuration([{name: 'default'}], undefined, {
+            timeInterval: tv,
+            maxDataPoints: 10,
+            timeBase: new Date().getTime() / 1000
+        })
+    });
+
+
+    var in_y_axis = new Rickshaw.Graph.Axis.Y({
+        graph: in_graph,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('in_y_axis')
+    });
+
+    var out_y_axis = new Rickshaw.Graph.Axis.Y({
+        graph: out_graph,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('out_y_axis')
+    });
+
+    in_graph.render();
+    out_graph.render();
+
+
+    // Socket Stuff
+    var socket = io.connect('http://localhost:3000');
+    socket.on('news', function(data){
+        console.log(data);
+    });
+
+    socket.on('arduino', function(data){
+        console.log(data);
+
+        // Add data to the correct key for that series
+        var pin_series = 'pin' + data.pin;
+        var new_data = {};
+        new_data[pin_series] = data.val;
+        new_data['default'] = 1024 / 2;
+
+
+        // Choose the input or output graph
+        if(data.dir == '1') {
+            in_graph.series.addData(new_data);
+            in_graph.render();
+        } else {
+            out_graph.series.addData(new_data);
+            out_graph.render();
+        }
+
+        monitor = document.getElementById('monitor');
+        monitor.innerHTML = monitor.innerHTML + "<p>" + data.raw + "</p>";
+    });
+</script>
+
+
+
+
 
 <script>
     var title = document.getElementById('title');

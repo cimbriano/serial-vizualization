@@ -13,7 +13,7 @@ console.log('Listening on port 3000');
 // Serial Port Setup
 var SerialPort = require('serialport').SerialPort
 var serialport = new SerialPort('/dev/tty.usbmodemfa131', {
-    baudrate: 28800,
+    baudrate: 9600,
     databits: 8,
     stopbits: 1,
 });
@@ -26,7 +26,6 @@ serialport.on('open', function(){
 
 // Set up socket.io
 io.sockets.on('connection', function(socket){
-    console.log(io.sockets);
     socket.emit('news', { hello: 'world'});
 });
 
@@ -39,7 +38,8 @@ serialport.on('data', function(data){
     if(parts.length == 3) {
         io.sockets.emit('arduino', { pin: parts[0],
                              val: parts[1],
-                             dir: parts[2] });
+                             dir: parts[2],
+                             raw: String(data) });
     }
 });
 
